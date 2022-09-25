@@ -1,1 +1,79 @@
 # Week-5-Visualizations-Activity
+---
+title: "Week 5 Visualizations Activity"
+author: "Mahsa Karkhaneh"
+date: '2022'
+output: 
+  html_document:
+    theme: 
+      bootswatch: darkly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(knitr)
+library(bslib)
+library(dplyr)
+library(ggplot2)
+```
+
+We have data about cases where police have killed Americans in 2015.
+
+```{r police_killing , echo=FALSE}
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/police-killings/police_killings.csv"
+police_killing <- read_csv(url)
+police_killing<- as.data.frame(police_killing)
+# I used read_csv() and as.data.frame() in order to read and consider data set as a data frame to R, respectively. 
+```
+
+```{r, echo=FALSE}
+mydata <-  police_killing %>% 
+  select(name,age,gender,raceethnicity,city,state,pop,h_income,county_income,comp_income)
+```
+
+This data set has `r nrow(mydata)` rows and `r ncol(mydata)` columns.
+.The names of the columns and a brief description are in the table below:
+
+``` {r, echo = FALSE}
+text_tbl <- data.frame(Names=c("name","age","gender","raceethnicity","city","state","pop","h_income","county_income","comp_income"),Description=c("Name of deceased","Age of deceased","Gender of deceased","Race/ethnicity of deceased","City where incident occurred","State where incident occurred","Tract population","Tract-level median household income","County-level median household income","h_income / county_income"))
+text_tbl
+
+```
+
+In following plot we can compare the deceased based on race ethnicity :
+
+```{r, echo=FALSE}
+mydata %>% 
+  ggplot(aes(fct_infreq(raceethnicity)%>% fct_rev())) + 
+  geom_bar()+coord_flip()+labs(x="deceased race")
+```
+
+Following Histogram indicates that majority of deceased has a  household income less than 50,000 yearly.
+
+```{r, echo=FALSE}
+ggplot(mydata, aes(h_income)) +
+  geom_histogram()
+```
+
+```{r, echo=FALSE}
+low_income <- mydata %>% 
+  filter(comp_income < 0.5 )
+```
+
+Assumed that “low-income” earners are people whose household income is less than half of County-level median household, so We have   `r nrow(low_income)` deceased that are low income. The distribution is shown
+below: 
+
+```{r, echo=FALSE}
+low_income %>% 
+  ggplot(aes(comp_income)) + 
+  geom_freqpoly(binwidth = 0.01)
+```
+
+Also following bar chart shows most of deceased are male :
+
+```{r, echo=FALSE}
+mydata %>% 
+  ggplot(aes(fct_infreq(gender)%>% fct_rev())) + 
+  geom_bar()+coord_flip()+labs(x="deceased gender")
+```
